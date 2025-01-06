@@ -1,0 +1,8 @@
+server:
+  port: 9999
+
+print:
+  settings:
+    baseUrl: 47.106.243.154:816
+    fileLocation: C:\spd-print
+    lowValueTagDir: lowValueTagPdfs

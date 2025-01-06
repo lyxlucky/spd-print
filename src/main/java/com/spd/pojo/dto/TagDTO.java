@@ -1,0 +1,56 @@
+package com.spd.pojo.dto;
+
+
+public class TagDTO {
+
+    private String id;
+
+    private String format;
+
+    private String inline;
+
+    private String jsonid;
+
+    private String jsonno;
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public String getInline() {
+        return inline;
+    }
+
+    public void setInline(String inline) {
+        this.inline = inline;
+    }
+
+    public String getJsonid() {
+        return jsonid;
+    }
+
+    public void setJsonid(String jsonid) {
+        this.jsonid = jsonid;
+    }
+
+    public String getJsonno() {
+        return jsonno;
+    }
+
+    public void setJsonno(String jsonno) {
+        this.jsonno = jsonno;
+    }
+}
