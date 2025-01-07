@@ -3,6 +3,11 @@ server:
 
 print:
   settings:
-    baseUrl: 47.106.243.154:816
+    bdBaseUrl: 47.106.243.154:9001
+    zqBaseUrl: 47.106.243.154:816
+    lgBaseUrl: 218.17.60.162:10052
+    hnBaseUrl: 183.62.200.242:82
+    fyBaseUrl: 61.145.158.182:10082
+    smBaseUrl: 120.78.226.92:18002
     fileLocation: C:\spd-print
     lowValueTagDir: lowValueTagPdfs

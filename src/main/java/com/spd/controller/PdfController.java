@@ -2,12 +2,12 @@ package com.spd.controller;
 
 import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spd.config.PrintConfig;
 import com.spd.pojo.dto.TagDTO;
 import com.spd.pojo.vo.LowValueTagResponseVO;
 import com.spd.pojo.vo.ResponseVO;
+import com.spd.utils.BaseUrlFactory;
 import com.spd.utils.PdfboxUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +21,16 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/print")
 public class PdfController extends BaseController{
-
     @Autowired
     private PdfboxUtil pdfboxUtil;
-
     @Autowired
     private PrintConfig printConfig;
+    @Autowired
+    private BaseUrlFactory baseUrlFactory;
 
     @GetMapping("/lowValueTagPdf")
     public ResponseVO lowValueTag(TagDTO tagDTO){
-        String response = HttpUtil.get("http://"+ printConfig.getBaseUrl() +"/api/PrintPdf/GetBDJYKBQJSON?id="+tagDTO.getId()+"&format="+tagDTO.getFormat()+"&inline="+tagDTO.getInline()+"&jsonid="+tagDTO.getJsonid()+"&jsonno="+tagDTO.getJsonno()+"");
+        String response = HttpUtil.get("http://"+ baseUrlFactory.declareBaseUrl(tagDTO.getHospitalId()) +"/api/PrintPdf/GetBDJYKBQJSON?id="+tagDTO.getId()+"&format="+tagDTO.getFormat()+"&inline="+tagDTO.getInline()+"&jsonid="+tagDTO.getJsonid()+"&jsonno="+tagDTO.getJsonno()+"");
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             LowValueTagResponseVO tag = objectMapper.readValue(response, LowValueTagResponseVO.class);

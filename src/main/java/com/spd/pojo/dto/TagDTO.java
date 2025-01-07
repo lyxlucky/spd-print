@@ -13,6 +13,15 @@ public class TagDTO {
 
     private String jsonno;
 
+    private String hospitalId;
+
+    public String getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(String hospitalId) {
+        this.hospitalId = hospitalId;
+    }
 
     public String getId() {
         return id;

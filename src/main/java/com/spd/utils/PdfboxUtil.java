@@ -51,7 +51,7 @@ public class PdfboxUtil {
                     contentStream.setFont(font, 10);
                     //设置内容
                     contentStream.newLineAtOffset(10, 90);
-                    contentStream.showText("物品条码：" + item.getDefNoPkgCode());
+                    contentStream.showText("物品条码：" + item.getVarietieCode() + "/" + item.getDefNoPkgCode());
                     contentStream.newLineAtOffset(0, -14);
                     contentStream.showText("物品名称：" + item.getVarietieName());
                     contentStream.newLineAtOffset(0, -14);

@@ -9,7 +9,17 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "print.settings")
 public class PrintConfig {
 
-    private  String baseUrl;
+    private  String zqBaseUrl;
+
+    private String bdBaseUrl;
+
+    private String lgBaseUrl;
+
+    private String hnBaseUrl;
+
+    private String fyBaseUrl;
+
+    private String smBaseUrl;
 
     private String fileLocation;
 
@@ -31,11 +41,51 @@ public class PrintConfig {
         this.fileLocation = fileLocation;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    public String getZqBaseUrl() {
+        return zqBaseUrl;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public void setZqBaseUrl(String zqBaseUrl) {
+        this.zqBaseUrl = zqBaseUrl;
+    }
+
+    public String getBdBaseUrl() {
+        return bdBaseUrl;
+    }
+
+    public void setBdBaseUrl(String bdBaseUrl) {
+        this.bdBaseUrl = bdBaseUrl;
+    }
+
+    public String getLgBaseUrl() {
+        return lgBaseUrl;
+    }
+
+    public void setLgBaseUrl(String lgBaseUrl) {
+        this.lgBaseUrl = lgBaseUrl;
+    }
+
+    public String getHnBaseUrl() {
+        return hnBaseUrl;
+    }
+
+    public void setHnBaseUrl(String hnBaseUrl) {
+        this.hnBaseUrl = hnBaseUrl;
+    }
+
+    public String getFyBaseUrl() {
+        return fyBaseUrl;
+    }
+
+    public void setFyBaseUrl(String fyBaseUrl) {
+        this.fyBaseUrl = fyBaseUrl;
+    }
+
+    public String getSmBaseUrl() {
+        return smBaseUrl;
+    }
+
+    public void setSmBaseUrl(String smBaseUrl) {
+        this.smBaseUrl = smBaseUrl;
     }
 }
