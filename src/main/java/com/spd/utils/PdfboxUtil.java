@@ -3,6 +3,7 @@ package com.spd.utils;
 import com.google.zxing.WriterException;
 import com.spd.config.PrintConfig;
 import com.spd.pojo.vo.LowValueTagVO;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -38,7 +39,7 @@ public class PdfboxUtil {
         PDFont font = PDType0Font.load(document, inputStream);
         PDRectangle pageSize = new PDRectangle(260, 160); // 72为PDF中每英寸的点数
         try {
-            data.forEach(item -> {
+            for (LowValueTagVO item : data) {
                 try {
                     PDPage page = new PDPage(pageSize);
                     document.addPage(page);
@@ -51,9 +52,9 @@ public class PdfboxUtil {
                     contentStream.setFont(font, 10);
                     //设置内容
                     contentStream.newLineAtOffset(10, 90);
-                    contentStream.showText("物品条码：" + item.getVarietieCode() + "/" + item.getDefNoPkgCode());
+                    contentStream.showText("物品条码：" + (item.getVarietieCode()) + "/" + (item.getDefNoPkgCode()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品名称：" + item.getVarietieName());
+                    contentStream.showText("物品名称：" + item.getVarietieName().replace("\n",""));
                     contentStream.newLineAtOffset(0, -14);
                     contentStream.showText("物品规格：" + item.getSpecificationOrType());
                     contentStream.newLineAtOffset(0, -14);
@@ -68,7 +69,7 @@ public class PdfboxUtil {
                 } catch (IOException | WriterException e) {
                     throw new RuntimeException(e);
                 }
-            });
+            }
             long formattedName = Instant.now().toEpochMilli();
             String locatePath = printConfig.getFileLocation() + "/" + printConfig.getLowValueTagDir() + "/";
             File file = new File(locatePath);

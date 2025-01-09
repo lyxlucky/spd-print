@@ -6,21 +6,15 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.oned.Code128Writer;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.EnumMap;
 import java.util.Map;
 
 @Component
 public class ZxingUtil {
-
-
-
 
     public BufferedImage generateCode128(String text,int width,int height,int margin) throws WriterException {
         Code128Writer writer = new Code128Writer();
