@@ -14,6 +14,10 @@ public class LowValueTagVO {
     private String varietieName;
     @JsonProperty("Specification_Or_Type")
     private String specificationOrType;
+    @JsonProperty("SPECIFICATION_OR_TYPE2")
+    private String specificationOrType2;
+    @JsonProperty("SPECIFICATION_OR_TYPE3")
+    private String specificationOrType3;
     @JsonProperty("Unit")
     private String unit;
     @JsonProperty("Varietie_Code")
@@ -26,7 +30,42 @@ public class LowValueTagVO {
     private String batchValidityPeriod;
     @JsonProperty("SUPPLIER_NAME")
     private String supplierName;
+    @JsonProperty("SUPPLY_PRICE")
+    private int SUPPLY_PRICE;
+    @JsonProperty("APPROVAL_NUMBER")
+    private String approvalNumber;
 
+    public String getApprovalNumber() {
+        return approvalNumber;
+    }
+
+    public void setApprovalNumber(String approvalNumber) {
+        this.approvalNumber = approvalNumber;
+    }
+
+    public String getSpecificationOrType2() {
+        return specificationOrType2;
+    }
+
+    public void setSpecificationOrType2(String specificationOrType2) {
+        this.specificationOrType2 = specificationOrType2;
+    }
+
+    public String getSpecificationOrType3() {
+        return specificationOrType3;
+    }
+
+    public void setSpecificationOrType3(String specificationOrType3) {
+        this.specificationOrType3 = specificationOrType3;
+    }
+
+    public int getSUPPLY_PRICE() {
+        return SUPPLY_PRICE;
+    }
+
+    public void setSUPPLY_PRICE(int SUPPLY_PRICE) {
+        this.SUPPLY_PRICE = SUPPLY_PRICE;
+    }
 
     public String getDefNoPkgCode() {
         return defNoPkgCode;

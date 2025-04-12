@@ -15,6 +15,16 @@ public class TagDTO {
 
     private String hospitalId;
 
+    public boolean isEnable;
+
+    public boolean isEnable() {
+        return isEnable;
+    }
+
+    public void setEnable(boolean enable) {
+        isEnable = enable;
+    }
+
     public String getHospitalId() {
         return hospitalId;
     }

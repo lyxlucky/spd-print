@@ -25,6 +25,26 @@ public class PrintConfig {
 
     private String lowValueTagDir;
 
+    private String bdrmBaseUrl;
+
+    private boolean enable;
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+
+    public String getBdrmBaseUrl() {
+        return bdrmBaseUrl;
+    }
+
+    public void setBdrmBaseUrl(String bdrmBaseUrl) {
+        this.bdrmBaseUrl = bdrmBaseUrl;
+    }
+
     public String getLowValueTagDir() {
         return lowValueTagDir;
     }

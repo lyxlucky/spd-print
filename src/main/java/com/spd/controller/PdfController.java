@@ -36,14 +36,19 @@ public class PdfController extends BaseController{
             LowValueTagResponseVO tag = objectMapper.readValue(response, LowValueTagResponseVO.class);
             if(tag.getCode() == HttpStatus.HTTP_OK){
                 if(!tag.getData().isEmpty()){
-                    String filename = pdfboxUtil.generateLowValueTag(tag.getData());
-                    return success(printConfig.getLowValueTagDir() + "/" + filename);
+                    if("261".equals(tagDTO.getHospitalId())){
+                        String filename = pdfboxUtil.generatePekingLowValueTag(tag.getData());
+                        return success(printConfig.getLowValueTagDir() + "/" + filename);
+                    }else{
+                        String filename = pdfboxUtil.generateLowValueTag(tag.getData());
+                        return success(printConfig.getLowValueTagDir() + "/" + filename);
+                    }
                 }
                 return error("无数据可打印");
             }
+            return error("无数据可打印");
         } catch (IOException e) {
             return error(e);
         }
-        return error("处理失败");
     }
 }

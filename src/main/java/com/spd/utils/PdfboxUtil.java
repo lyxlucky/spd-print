@@ -33,11 +33,84 @@ public class PdfboxUtil {
 
     private ClassLoader classLoader = this.getClass().getClassLoader();
 
+    public String generatePekingLowValueTag(List<LowValueTagVO> data) throws IOException {
+        PDDocument document = new PDDocument();
+        InputStream inputStream = classLoader.getResourceAsStream("fonts/simhei.ttf");
+        PDFont font = PDType0Font.load(document, inputStream);
+        PDRectangle pageSize = new PDRectangle(300, 180); // 72为PDF中每英寸的点数
+        try {
+            int sequenceNumber = 1; // Initialize sequence number counter
+
+            for (LowValueTagVO item : data) {
+                try {
+                    PDPage page = new PDPage(pageSize);
+                    document.addPage(page);
+                    // 创建一个内容流
+                    PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                    BufferedImage barcodeImage = zxingUtil.generateQRCodeImage((printConfig.isEnable() ? (item.getDefNoPkgCode()) : (item.getDefNoPkgCode().replace('0','O'))), 300, 100, 1);
+                    PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
+                    contentStream.drawImage(pdImage, 100, 2); // 调整位置
+                    // Add sequence number to top right corner
+                    contentStream.beginText();
+                    contentStream.setFont(font, 10);
+                    contentStream.newLineAtOffset(265, 155); // Position at the top right corner
+                    contentStream.showText(("序：" + sequenceNumber));
+                    contentStream.endText();
+                    // Increment the sequence number for next page
+                    sequenceNumber++;
+                    // Continue with the rest of the content
+                    contentStream.beginText();
+                    contentStream.setFont(font, 10);
+                    ////设置内容
+                    contentStream.newLineAtOffset(10, 155);
+                    contentStream.showText("物资编码：" + StringEscapeUtils.unescapeJava(item.getVarietieCode()));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("定数码：" + (printConfig.isEnable() ? StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()) : StringEscapeUtils.unescapeJava(item.getDefNoPkgCode().replace('0','O'))));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("商品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName()));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(item.getManufacturingEntName()));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("注册证：" + StringEscapeUtils.unescapeJava(item.getApprovalNumber()));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().length() > 20 ? item.getSpecificationOrType().substring(0, 20) : item.getSpecificationOrType()));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()));
+                    contentStream.newLineAtOffset(0, -19);
+                    contentStream.showText("效期：" + StringEscapeUtils.unescapeJava(item.getBatchValidityPeriod()));
+                    //设置内容
+                    contentStream.endText();
+                    contentStream.close();
+                } catch (IOException | WriterException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            long formattedName = Instant.now().toEpochMilli();
+            String locatePath = printConfig.getFileLocation() + "/" + printConfig.getLowValueTagDir() + "/";
+            File file = new File(locatePath);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+            String filename = formattedName + ".pdf";
+            String filepath = locatePath + filename;
+            document.save(filepath);
+            return filename;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            assert inputStream != null;
+            inputStream.close();
+            document.close();
+        }
+    }
+
+
+
     public String generateLowValueTag(List<LowValueTagVO> data) throws IOException {
         PDDocument document = new PDDocument();
         InputStream inputStream = classLoader.getResourceAsStream("fonts/simhei.ttf");
         PDFont font = PDType0Font.load(document, inputStream);
-        PDRectangle pageSize = new PDRectangle(260, 160); // 72为PDF中每英寸的点数
+        PDRectangle pageSize = new PDRectangle(300,180); // 72为PDF中每英寸的点数
         try {
             for (LowValueTagVO item : data) {
                 try {
@@ -45,24 +118,26 @@ public class PdfboxUtil {
                     document.addPage(page);
                     // 创建一个内容流
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
-                    BufferedImage barcodeImage = zxingUtil.generateCode128(item.getDefNoPkgCode(),200,40,10);
+                    BufferedImage barcodeImage = zxingUtil.generateCode128((printConfig.isEnable() ? StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()) : StringEscapeUtils.unescapeJava(item.getDefNoPkgCode().replace('0','O'))),250,60,10);
                     PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
                     contentStream.drawImage(pdImage, 30, 110); // 调整位置
                     contentStream.beginText();
                     contentStream.setFont(font, 10);
                     //设置内容
                     contentStream.newLineAtOffset(10, 90);
-                    contentStream.showText("物品条码：" + (item.getVarietieCode()) + "/" + (item.getDefNoPkgCode()));
+                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(item.getVarietieCode()).replaceAll("\\p{C}", "")) + "/" + ((printConfig.isEnable() ? StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()) : StringEscapeUtils.unescapeJava(item.getDefNoPkgCode().replace('0','O')))).replaceAll("\\p{C}", ""));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品名称：" + item.getVarietieName().replace("\n",""));
+                    contentStream.showText("系数：" + StringEscapeUtils.unescapeJava(item.getCoefficient()).replaceAll("\\p{C}", ""));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品规格：" + item.getSpecificationOrType());
+                    contentStream.showText("物品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName()).replaceAll("\\p{C}", ""));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("批号：" + item.getBatch());
+                    contentStream.showText("物品规格：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType()).replaceAll("\\p{C}", ""));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("有效期：" + item.getBatchValidityPeriod());
+                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()).replaceAll("\\p{C}", ""));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("供应商：" + item.getSupplierName());
+                    contentStream.showText("有效期：" + StringEscapeUtils.unescapeJava(item.getBatchValidityPeriod()).replaceAll("\\p{C}", ""));
+                    contentStream.newLineAtOffset(0, -14);
+                    contentStream.showText("供应商：" + StringEscapeUtils.unescapeJava(item.getSupplierName()).replaceAll("\\p{C}", ""));
                     //设置内容
                     contentStream.endText();
                     contentStream.close();

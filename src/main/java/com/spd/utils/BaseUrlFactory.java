@@ -24,6 +24,7 @@ public class BaseUrlFactory {
         HOSPITAL_URL_MAP.put("161", printConfig.getHnBaseUrl());
         HOSPITAL_URL_MAP.put("221", printConfig.getFyBaseUrl());
         HOSPITAL_URL_MAP.put("241", printConfig.getSmBaseUrl());
+        HOSPITAL_URL_MAP.put("261", printConfig.getBdrmBaseUrl());
     }
 
     public String declareBaseUrl(String hospitalCode){
