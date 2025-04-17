@@ -3,7 +3,6 @@ server:
 
 print:
   settings:
-    enable: false
     bdBaseUrl: 47.106.243.154:9001
     zqBaseUrl: 47.106.243.154:9016
     lgBaseUrl: 218.17.60.162:10052

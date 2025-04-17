@@ -40,20 +40,19 @@ public class PdfboxUtil {
         PDRectangle pageSize = new PDRectangle(300, 180); // 72为PDF中每英寸的点数
         try {
             int sequenceNumber = 1; // Initialize sequence number counter
-
             for (LowValueTagVO item : data) {
                 try {
                     PDPage page = new PDPage(pageSize);
                     document.addPage(page);
                     // 创建一个内容流
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
-                    BufferedImage barcodeImage = zxingUtil.generateQRCodeImage((printConfig.isEnable() ? (item.getDefNoPkgCode()) : (item.getDefNoPkgCode().replace('0','O'))), 300, 100, 1);
+                    BufferedImage barcodeImage = zxingUtil.generateQRCodeImage((item.getDefNoPkgCode()), 300, 100, 1);
                     PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
                     contentStream.drawImage(pdImage, 100, 2); // 调整位置
                     // Add sequence number to top right corner
                     contentStream.beginText();
                     contentStream.setFont(font, 10);
-                    contentStream.newLineAtOffset(265, 155); // Position at the top right corner
+                    contentStream.newLineAtOffset(265, 155);
                     contentStream.showText(("序：" + sequenceNumber));
                     contentStream.endText();
                     // Increment the sequence number for next page
@@ -65,15 +64,15 @@ public class PdfboxUtil {
                     contentStream.newLineAtOffset(10, 155);
                     contentStream.showText("物资编码：" + StringEscapeUtils.unescapeJava(item.getVarietieCode()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("定数码：" + (printConfig.isEnable() ? StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()) : StringEscapeUtils.unescapeJava(item.getDefNoPkgCode().replace('0','O'))));
+                    contentStream.showText("定数码：" + ((item.getDefNoPkgCode())));
                     contentStream.newLineAtOffset(0, -19);
                     contentStream.showText("商品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(item.getManufacturingEntName()));
+                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().length() > 20 ? item.getSpecificationOrType().substring(0, 20) : item.getSpecificationOrType()));
                     contentStream.newLineAtOffset(0, -19);
                     contentStream.showText("注册证：" + StringEscapeUtils.unescapeJava(item.getApprovalNumber()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().length() > 20 ? item.getSpecificationOrType().substring(0, 20) : item.getSpecificationOrType()));
+                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(item.getManufacturingEntName()));
                     contentStream.newLineAtOffset(0, -19);
                     contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()));
                     contentStream.newLineAtOffset(0, -19);
@@ -118,14 +117,14 @@ public class PdfboxUtil {
                     document.addPage(page);
                     // 创建一个内容流
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
-                    BufferedImage barcodeImage = zxingUtil.generateCode128((printConfig.isEnable() ? StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()) : StringEscapeUtils.unescapeJava(item.getDefNoPkgCode().replace('0','O'))),250,60,10);
+                    BufferedImage barcodeImage = zxingUtil.generateCode128((item.getDefNoPkgCode()),250,60,10);
                     PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
                     contentStream.drawImage(pdImage, 30, 110); // 调整位置
                     contentStream.beginText();
                     contentStream.setFont(font, 10);
                     //设置内容
                     contentStream.newLineAtOffset(10, 90);
-                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(item.getVarietieCode()).replaceAll("\\p{C}", "")) + "/" + ((printConfig.isEnable() ? StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()) : StringEscapeUtils.unescapeJava(item.getDefNoPkgCode().replace('0','O')))).replaceAll("\\p{C}", ""));
+                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(item.getVarietieCode()).replaceAll("\\p{C}", "")) + "/" + (StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()).replaceAll("\\p{C}", "")));
                     contentStream.newLineAtOffset(0, -14);
                     contentStream.showText("系数：" + StringEscapeUtils.unescapeJava(item.getCoefficient()).replaceAll("\\p{C}", ""));
                     contentStream.newLineAtOffset(0, -14);
