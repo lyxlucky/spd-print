@@ -35,7 +35,7 @@ public class PdfboxUtil {
 
     public String generatePekingLowValueTag(List<LowValueTagVO> data) throws IOException {
         PDDocument document = new PDDocument();
-        InputStream inputStream = classLoader.getResourceAsStream("fonts/simhei.ttf");
+        InputStream inputStream = classLoader.getResourceAsStream("fonts/NotoSansSC-Regular.ttf");
         PDFont font = PDType0Font.load(document, inputStream);
         PDRectangle pageSize = new PDRectangle(300, 180); // 72为PDF中每英寸的点数
         try {
@@ -48,16 +48,13 @@ public class PdfboxUtil {
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
                     BufferedImage barcodeImage = zxingUtil.generateQRCodeImage((item.getDefNoPkgCode()), 300, 100, 1);
                     PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
-                    contentStream.drawImage(pdImage, 100, 2); // 调整位置
-                    // Add sequence number to top right corner
+                    contentStream.drawImage(pdImage, 90, 2); // 调整位置
                     contentStream.beginText();
                     contentStream.setFont(font, 10);
                     contentStream.newLineAtOffset(265, 155);
                     contentStream.showText(("序：" + sequenceNumber));
                     contentStream.endText();
-                    // Increment the sequence number for next page
                     sequenceNumber++;
-                    // Continue with the rest of the content
                     contentStream.beginText();
                     contentStream.setFont(font, 10);
                     ////设置内容
@@ -68,11 +65,11 @@ public class PdfboxUtil {
                     contentStream.newLineAtOffset(0, -19);
                     contentStream.showText("商品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().length() > 20 ? item.getSpecificationOrType().substring(0, 20) : item.getSpecificationOrType()));
+                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().length() > 20 ? item.getSpecificationOrType().substring(0, 20) + "..." : item.getSpecificationOrType()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("注册证：" + StringEscapeUtils.unescapeJava(item.getApprovalNumber()));
+                    contentStream.showText("注册证：" + StringEscapeUtils.unescapeJava(item.getApprovalNumber().length() > 25 ? item.getApprovalNumber().substring(0,25) + "..." : item.getApprovalNumber()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(item.getManufacturingEntName()));
+                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(item.getManufacturingEntName().length() > 14 ? item.getManufacturingEntName().substring(0,14) + "..." : item.getManufacturingEntName()));
                     contentStream.newLineAtOffset(0, -19);
                     contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()));
                     contentStream.newLineAtOffset(0, -19);
