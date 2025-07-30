@@ -101,10 +101,9 @@ public class PdfboxUtil {
     }
 
 
-
     public String generateLowValueTag(List<LowValueTagVO> data) throws IOException {
         PDDocument document = new PDDocument();
-        InputStream inputStream = classLoader.getResourceAsStream("fonts/simhei.ttf");
+        InputStream inputStream = classLoader.getResourceAsStream("fonts/NotoSansSC-Regular.ttf");
         PDFont font = PDType0Font.load(document, inputStream);
         PDRectangle pageSize = new PDRectangle(300,180); // 72为PDF中每英寸的点数
         try {
@@ -121,19 +120,19 @@ public class PdfboxUtil {
                     contentStream.setFont(font, 10);
                     //设置内容
                     contentStream.newLineAtOffset(10, 90);
-                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(item.getVarietieCode()).replaceAll("\\p{C}", "")) + "/" + (StringEscapeUtils.unescapeJava(item.getDefNoPkgCode()).replaceAll("\\p{C}", "")));
+                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(item.getVarietieCode())) + "/" + (StringEscapeUtils.unescapeJava(item.getDefNoPkgCode())));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("系数：" + StringEscapeUtils.unescapeJava(item.getCoefficient()).replaceAll("\\p{C}", ""));
+                    contentStream.showText("系数：" + StringEscapeUtils.unescapeJava(item.getCoefficient()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName()).replaceAll("\\p{C}", ""));
+                    contentStream.showText("物品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName().replaceAll("\n","")));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品规格：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType()).replaceAll("\\p{C}", ""));
+                    contentStream.showText("物品规格：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().replaceAll("\n","")));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()).replaceAll("\\p{C}", ""));
+                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("有效期：" + StringEscapeUtils.unescapeJava(item.getBatchValidityPeriod()).replaceAll("\\p{C}", ""));
+                    contentStream.showText("有效期：" + StringEscapeUtils.unescapeJava(item.getBatchValidityPeriod()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("供应商：" + StringEscapeUtils.unescapeJava(item.getSupplierName()).replaceAll("\\p{C}", ""));
+                    contentStream.showText("供应商：" + StringEscapeUtils.unescapeJava(item.getSupplierName()));
                     //设置内容
                     contentStream.endText();
                     contentStream.close();
