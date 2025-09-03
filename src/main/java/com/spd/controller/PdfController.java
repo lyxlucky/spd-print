@@ -1,7 +1,5 @@
 package com.spd.controller;
 
-import cn.hutool.http.HttpStatus;
-import cn.hutool.http.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spd.config.PrintConfig;
 import com.spd.pojo.dto.TagDTO;
@@ -9,6 +7,7 @@ import com.spd.pojo.vo.LowValueTagResponseVO;
 import com.spd.pojo.vo.ResponseVO;
 import com.spd.utils.BaseUrlFactory;
 import com.spd.utils.PdfboxUtil;
+import com.spd.utils.OkHttpUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,14 +26,21 @@ public class PdfController extends BaseController{
     private PrintConfig printConfig;
     @Autowired
     private BaseUrlFactory baseUrlFactory;
+    @Autowired
+    private OkHttpUtil okHttpUtil;
 
     @GetMapping("/lowValueTagPdf")
     public ResponseVO lowValueTag(TagDTO tagDTO){
-        String response = HttpUtil.get("http://"+ baseUrlFactory.declareBaseUrl(tagDTO.getHospitalId()) +"/api/PrintPdf/GetBDJYKBQJSON?id="+tagDTO.getId()+"&format="+tagDTO.getFormat()+"&inline="+tagDTO.getInline()+"&jsonid="+tagDTO.getJsonid()+"&jsonno="+tagDTO.getJsonno()+"");
-        ObjectMapper objectMapper = new ObjectMapper();
+        // 构建请求URL
+        String url = "http://"+ baseUrlFactory.declareBaseUrl(tagDTO.getHospitalId()) +"/api/PrintPdf/GetBDJYKBQJSON?id="+tagDTO.getId()+"&format="+tagDTO.getFormat()+"&inline="+tagDTO.getInline()+"&jsonid="+tagDTO.getJsonid()+"&jsonno="+tagDTO.getJsonno()+"";
+
         try {
-            LowValueTagResponseVO tag = objectMapper.readValue(response, LowValueTagResponseVO.class);
-            if(tag.getCode() == HttpStatus.HTTP_OK){
+            // 使用OkHttpUtil工具类发送GET请求
+            String responseBody = okHttpUtil.get(url);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            LowValueTagResponseVO tag = objectMapper.readValue(responseBody, LowValueTagResponseVO.class);
+            if(tag.getCode() == 200){
                 if(!tag.getData().isEmpty()){
                     if("261".equals(tagDTO.getHospitalId())){
                         String filename = pdfboxUtil.generatePekingLowValueTag(tag.getData());

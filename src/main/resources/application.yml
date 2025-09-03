@@ -13,8 +13,6 @@ print:
     fileLocation: C:\spd-print
     lowValueTagDir: lowValueTagPdfs
 
-notify:
-  wx-pusher:
-    wx-pusher-baseurl:
-    wx-pusher-spt:
-
+spring:
+  profiles:
+    active: dev

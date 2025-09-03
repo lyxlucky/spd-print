@@ -1,0 +1,12 @@
+paperless:
+  appId: 532041839864005
+  accessKey: d8c7d2f13073fc7c3ff581917c303ec4f90d31d6
+  secretKey: cbf49f774905e20c1ed3546078a0c01d28be5a54c17d13ae55b8b0a5c92e5c49b00631502ce22287eb5e29d093d8c429f6c0f3e857c6808cda18806b99a0db0b
+  domainUrl: 172.27.2.104
+  fileLocation: C:\spd-print
+  paperlessDir: paperlessPdfs
+  spd:
+    BaseUrl: 41.106.243.154:9001
+    documentUploadPath: /api/upload
+    timeout: 30000
+    retryCount: 3
