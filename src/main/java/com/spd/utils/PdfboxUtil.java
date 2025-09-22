@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.Collections;
 
 @Component
 @Slf4j
@@ -42,21 +44,115 @@ public class PdfboxUtil {
     private PaperlessConfig paperlessConfig;
 
     private ClassLoader classLoader = this.getClass().getClassLoader();
+    private Random random = new Random();
 
+    /**
+     * 随机干扰定数码，让定数码和二维码不匹配
+     * 实现定数码集合内部的错位效果，标签位置不变，但定数码和二维码内容错位
+     * @param data 原始数据列表
+     * @return 干扰后的数据列表
+     */
+    public List<LowValueTagVO> randomizeDefNoPkgCode(List<LowValueTagVO> data) {
+        if (data == null || data.isEmpty()) {
+            return data;
+        }
+        
+        // 深拷贝原始数据，避免修改原始列表
+        List<LowValueTagVO> result = new ArrayList<>();
+        for (LowValueTagVO originalItem : data) {
+            LowValueTagVO newItem = new LowValueTagVO();
+            newItem.setDefNoPkgCode(originalItem.getDefNoPkgCode());
+            newItem.setManufacturingEntName(originalItem.getManufacturingEntName());
+            newItem.setChargingCode(originalItem.getChargingCode());
+            newItem.setVarietieName(originalItem.getVarietieName());
+            newItem.setSpecificationOrType(originalItem.getSpecificationOrType());
+            newItem.setSpecificationOrType2(originalItem.getSpecificationOrType2());
+            newItem.setSpecificationOrType3(originalItem.getSpecificationOrType3());
+            newItem.setUnit(originalItem.getUnit());
+            newItem.setVarietieCode(originalItem.getVarietieCode());
+            newItem.setBatch(originalItem.getBatch());
+            newItem.setCoefficient(originalItem.getCoefficient());
+            newItem.setBatchValidityPeriod(originalItem.getBatchValidityPeriod());
+            newItem.setSupplierName(originalItem.getSupplierName());
+            newItem.setSUPPLY_PRICE(originalItem.getSUPPLY_PRICE());
+            newItem.setApprovalNumber(originalItem.getApprovalNumber());
+            result.add(newItem);
+        }
+        int listSize = result.size();
+        
+        if (listSize <= 1) {
+            return result; // 只有一个或没有元素时不需要错位
+        }
+        
+        // 随机选择1到listSize个元素进行错位
+        int interferenceCount = random.nextInt(listSize) + 1;
+        
+        // 收集所有定数码
+        List<String> allDefNoPkgCodes = new ArrayList<>();
+        for (LowValueTagVO item : result) {
+            allDefNoPkgCodes.add(item.getDefNoPkgCode());
+        }
+        
+        // 随机打乱定数码列表
+        Collections.shuffle(allDefNoPkgCodes);
+        
+        // 随机选择要错位的索引
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < listSize; i++) {
+            indices.add(i);
+        }
+        Collections.shuffle(indices);
+        
+        // 对选中的元素进行错位
+        for (int i = 0; i < interferenceCount; i++) {
+            int index = indices.get(i);
+            LowValueTagVO item = result.get(index);
+            String originalCode = item.getDefNoPkgCode();
+            
+            // 从打乱的定数码列表中选择一个不同的定数码
+            String newCode = null;
+            for (String code : allDefNoPkgCodes) {
+                if (!code.equals(originalCode)) {
+                    newCode = code;
+                    break;
+                }
+            }
+            
+            if (newCode != null) {
+                item.setDefNoPkgCode(newCode);
+            }
+        }
+        
+        return result;
+    }
+
+    // 保持向后兼容性的重载方法
     public String generatePekingLowValueTag(List<LowValueTagVO> data) throws IOException {
+        return generatePekingLowValueTag(data, false);
+    }
+
+    public String generatePekingLowValueTag(List<LowValueTagVO> data, boolean isRandom) throws IOException {
         PDDocument document = new PDDocument();
         InputStream inputStream = classLoader.getResourceAsStream("fonts/NotoSansSC-Regular.ttf");
         PDFont font = PDType0Font.load(document, inputStream);
         PDRectangle pageSize = new PDRectangle(300, 180); // 72为PDF中每英寸的点数
         try {
+            // 如果是random模式，对数据进行随机干扰
+            List<LowValueTagVO> processedData = isRandom ? randomizeDefNoPkgCode(data) : data;
+            
             int sequenceNumber = 1; // Initialize sequence number counter
-            for (LowValueTagVO item : data) {
+            for (int i = 0; i < processedData.size(); i++) {
+                LowValueTagVO item = processedData.get(i);
+                // 标签显示使用原始数据
+                LowValueTagVO originalItem = data.get(i);
                 try {
                     PDPage page = new PDPage(pageSize);
                     document.addPage(page);
                     // 创建一个内容流
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
-                    BufferedImage barcodeImage = zxingUtil.generateQRCodeImage((item.getDefNoPkgCode()), 300, 100, 1);
+                    // 二维码使用错位的定数码，显示文本使用原始定数码
+                    String qrCodeContent = isRandom ? item.getDefNoPkgCode() : originalItem.getDefNoPkgCode();
+                    BufferedImage barcodeImage = zxingUtil.generateQRCodeImage(qrCodeContent, 300, 100, 1);
                     PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
                     contentStream.drawImage(pdImage, 90, 2); // 调整位置
                     contentStream.beginText();
@@ -69,21 +165,22 @@ public class PdfboxUtil {
                     contentStream.setFont(font, 10);
                     ////设置内容
                     contentStream.newLineAtOffset(10, 155);
-                    contentStream.showText("物资编码：" + StringEscapeUtils.unescapeJava(item.getVarietieCode()));
+                    contentStream.showText("物资编码：" + StringEscapeUtils.unescapeJava(originalItem.getVarietieCode()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("定数码：" + ((item.getDefNoPkgCode())));
+                    // 显示文本使用原始定数码
+                    contentStream.showText("定数码：" + originalItem.getDefNoPkgCode());
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("商品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName()));
+                    contentStream.showText("商品名称：" + StringEscapeUtils.unescapeJava(originalItem.getVarietieName()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().length() > 20 ? item.getSpecificationOrType().substring(0, 20) + "..." : item.getSpecificationOrType()));
+                    contentStream.showText("规格型号：" + StringEscapeUtils.unescapeJava(originalItem.getSpecificationOrType().length() > 20 ? originalItem.getSpecificationOrType().substring(0, 20) + "..." : originalItem.getSpecificationOrType()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("注册证：" + StringEscapeUtils.unescapeJava(item.getApprovalNumber().length() > 25 ? item.getApprovalNumber().substring(0,25) + "..." : item.getApprovalNumber()));
+                    contentStream.showText("注册证：" + StringEscapeUtils.unescapeJava(originalItem.getApprovalNumber().length() > 25 ? originalItem.getApprovalNumber().substring(0,25) + "..." : originalItem.getApprovalNumber()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(item.getManufacturingEntName().length() > 14 ? item.getManufacturingEntName().substring(0,14) + "..." : item.getManufacturingEntName()));
+                    contentStream.showText("生产商：" + StringEscapeUtils.unescapeJava(originalItem.getManufacturingEntName().length() > 14 ? originalItem.getManufacturingEntName().substring(0,14) + "..." : originalItem.getManufacturingEntName()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()));
+                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(originalItem.getBatch()));
                     contentStream.newLineAtOffset(0, -19);
-                    contentStream.showText("效期：" + StringEscapeUtils.unescapeJava(item.getBatchValidityPeriod()));
+                    contentStream.showText("效期：" + StringEscapeUtils.unescapeJava(originalItem.getBatchValidityPeriod()));
                     //设置内容
                     contentStream.endText();
                     contentStream.close();
@@ -110,39 +207,53 @@ public class PdfboxUtil {
         }
     }
 
-
+    // 保持向后兼容性的重载方法
     public String generateLowValueTag(List<LowValueTagVO> data) throws IOException {
+        return generateLowValueTag(data, false);
+    }
+
+    public String generateLowValueTag(List<LowValueTagVO> data, boolean isRandom) throws IOException {
         PDDocument document = new PDDocument();
         InputStream inputStream = classLoader.getResourceAsStream("fonts/NotoSansSC-Regular.ttf");
         PDFont font = PDType0Font.load(document, inputStream);
         PDRectangle pageSize = new PDRectangle(300,180); // 72为PDF中每英寸的点数
         try {
-            for (LowValueTagVO item : data) {
+            // 如果是random模式，对数据进行随机干扰
+            List<LowValueTagVO> processedData = isRandom ? randomizeDefNoPkgCode(data) : data;
+            
+            for (int i = 0; i < processedData.size(); i++) {
+                LowValueTagVO item = processedData.get(i);
+                // 标签显示使用原始数据
+                LowValueTagVO originalItem = data.get(i);
                 try {
                     PDPage page = new PDPage(pageSize);
                     document.addPage(page);
                     // 创建一个内容流
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
-                    BufferedImage barcodeImage = zxingUtil.generateCode128((item.getDefNoPkgCode()),250,60,10);
+                    // 条码使用错位的定数码，显示文本使用原始定数码
+                    String barcodeContent = isRandom ? item.getDefNoPkgCode() : originalItem.getDefNoPkgCode();
+                    String displayText = originalItem.getDefNoPkgCode();
+                    BufferedImage barcodeImage = zxingUtil.generateCode128(barcodeContent, displayText, 250, 60, 10);
                     PDImageXObject pdImage = JPEGFactory.createFromImage(document, barcodeImage);
                     contentStream.drawImage(pdImage, 30, 110); // 调整位置
                     contentStream.beginText();
                     contentStream.setFont(font, 10);
                     //设置内容
                     contentStream.newLineAtOffset(10, 90);
-                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(item.getVarietieCode())) + "/" + (StringEscapeUtils.unescapeJava(item.getDefNoPkgCode())));
+                    // 显示文本使用原始定数码
+                    contentStream.showText("物品条码：" + (StringEscapeUtils.unescapeJava(originalItem.getVarietieCode())) + "/" + (StringEscapeUtils.unescapeJava(originalItem.getDefNoPkgCode())));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("系数：" + StringEscapeUtils.unescapeJava(item.getCoefficient()));
+                    contentStream.showText("系数：" + StringEscapeUtils.unescapeJava(originalItem.getCoefficient()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品名称：" + StringEscapeUtils.unescapeJava(item.getVarietieName().replaceAll("\n","")));
+                    contentStream.showText("物品名称：" + StringEscapeUtils.unescapeJava(originalItem.getVarietieName().replaceAll("\n","")));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("物品规格：" + StringEscapeUtils.unescapeJava(item.getSpecificationOrType().replaceAll("\n","")));
+                    contentStream.showText("物品规格：" + StringEscapeUtils.unescapeJava(originalItem.getSpecificationOrType().replaceAll("\n","")));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(item.getBatch()));
+                    contentStream.showText("批号：" + StringEscapeUtils.unescapeJava(originalItem.getBatch()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("有效期：" + StringEscapeUtils.unescapeJava(item.getBatchValidityPeriod()));
+                    contentStream.showText("有效期：" + StringEscapeUtils.unescapeJava(originalItem.getBatchValidityPeriod()));
                     contentStream.newLineAtOffset(0, -14);
-                    contentStream.showText("供应商：" + StringEscapeUtils.unescapeJava(item.getSupplierName()));
+                    contentStream.showText("供应商：" + StringEscapeUtils.unescapeJava(originalItem.getSupplierName()));
                     //设置内容
                     contentStream.endText();
                     contentStream.close();

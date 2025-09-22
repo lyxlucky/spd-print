@@ -31,6 +31,12 @@ public class PdfController extends BaseController{
 
     @GetMapping("/lowValueTagPdf")
     public ResponseVO lowValueTag(TagDTO tagDTO){
+        // 检查type配置
+        String type = printConfig.getType();
+        if("false".equals(type)){
+            return error("无数据可打印");
+        }
+        
         // 构建请求URL
         String url = "http://"+ baseUrlFactory.declareBaseUrl(tagDTO.getHospitalId()) +"/api/PrintPdf/GetBDJYKBQJSON?id="+tagDTO.getId()+"&format="+tagDTO.getFormat()+"&inline="+tagDTO.getInline()+"&jsonid="+tagDTO.getJsonid()+"&jsonno="+tagDTO.getJsonno()+"";
 
@@ -43,10 +49,10 @@ public class PdfController extends BaseController{
             if(tag.getCode() == 200){
                 if(!tag.getData().isEmpty()){
                     if("261".equals(tagDTO.getHospitalId())){
-                        String filename = pdfboxUtil.generatePekingLowValueTag(tag.getData());
+                        String filename = pdfboxUtil.generatePekingLowValueTag(tag.getData(), "random".equals(type));
                         return success(printConfig.getLowValueTagDir() + "/" + filename);
                     }else{
-                        String filename = pdfboxUtil.generateLowValueTag(tag.getData());
+                        String filename = pdfboxUtil.generateLowValueTag(tag.getData(), "random".equals(type));
                         return success(printConfig.getLowValueTagDir() + "/" + filename);
                     }
                 }
