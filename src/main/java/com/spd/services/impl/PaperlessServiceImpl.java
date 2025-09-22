@@ -114,7 +114,7 @@ public class PaperlessServiceImpl implements PaperlessService {
                 result.setFileAbsolutePath(pdfFile.getAbsolutePath());
                 result.setSuccess(true);
                 result.setErrorMessage(null);
-                
+                result.setDocId(fileHashUtil.calculateSHA256(pdfFile));
                 results.add(result);
                 
                 log.info("PDF生成成功: {}, 相对路径: {}, 绝对路径: {}", 

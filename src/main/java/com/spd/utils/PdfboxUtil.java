@@ -467,7 +467,7 @@ public class PdfboxUtil {
                 contentStream.showText("住院号：" + (paperlessList.isEmpty() ? "" : 
                     (paperlessList.get(0).getHospitalizationNumber() != null ? paperlessList.get(0).getHospitalizationNumber() : "")));
                 contentStream.newLineAtOffset(200, 0);
-                contentStream.showText("次数：" + (paperlessList.isEmpty() ? "" : 
+                contentStream.showText("住院次数：" + (paperlessList.isEmpty() ? "" :
                     (paperlessList.get(0).getAdnissTimes() != null ? paperlessList.get(0).getAdnissTimes() : "")));
                 contentStream.endText();
 

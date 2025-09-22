@@ -1,5 +1,6 @@
 package com.spd.controller;
 
+import com.spd.pojo.dto.DocumentInfo;
 import com.spd.pojo.dto.PekingPaperlessDTO;
 import com.spd.pojo.dto.SaveDocumentRequestDTO;
 import com.spd.pojo.vo.DocumentStatus;
@@ -87,14 +88,18 @@ public class PaperlessController extends BaseController {
             // 所有文件生成成功，返回文件信息
             log.info("PDF生成成功，共生成 {} 个文件", results.size());
             
-            // 调用第三方接口，传递文件路径和文档名称
-            Map<String, String> filePathMap = new HashMap<>();
+            // 调用第三方接口，传递文件路径、文档名称和docId
+            Map<String, DocumentInfo> documentInfoMap = new HashMap<>();
             for (PdfGenerationResult result : results) {
-                filePathMap.put(result.getDocumentName(), result.getFileRelativePath());
+                DocumentInfo documentInfo = new DocumentInfo();
+                documentInfo.setDocumentName(result.getDocumentName());
+                documentInfo.setFileRelativePath(result.getFileRelativePath());
+                documentInfo.setDocId(result.getDocId());
+                documentInfoMap.put(result.getDocumentName(), documentInfo);
             }
             
-            // 批量调用第三方接口
-            int successCount = thirdPartyApiService.batchUploadDocumentInfo(filePathMap);
+            // 批量调用第三方接口（包含docId）
+            int successCount = thirdPartyApiService.batchUploadDocumentInfo(documentInfoMap);
             log.info("第三方接口调用完成，成功: {}, 总数: {}", successCount, results.size());
             
             return success(results);

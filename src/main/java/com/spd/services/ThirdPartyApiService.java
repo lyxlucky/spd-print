@@ -1,5 +1,7 @@
 package com.spd.services;
 
+import com.spd.pojo.dto.DocumentInfo;
+
 /**
  * 第三方接口服务
  */
@@ -17,8 +19,8 @@ public interface ThirdPartyApiService {
     /**
      * 批量上传文档信息
      * 
-     * @param filePathMap 文件路径映射（文档名称 -> 文件相对路径）
+     * @param documentInfoMap 文档信息映射（文档名称 -> 文档信息对象）
      * @return 成功上传的数量
      */
-    int batchUploadDocumentInfo(java.util.Map<String, String> filePathMap);
+    int batchUploadDocumentInfo(java.util.Map<String, DocumentInfo> documentInfoMap);
 }

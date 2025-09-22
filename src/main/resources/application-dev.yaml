@@ -6,7 +6,7 @@ paperless:
   fileLocation: C:\spd-print
   paperlessDir: paperlessPdfs
   spd:
-    BaseUrl: 41.106.243.154:9001
-    documentUploadPath: /api/upload
+    BaseUrl: http://localhost:18002
+    documentUploadPath: /api/PekingApplication/receiptPaperlessPdf
     timeout: 30000
     retryCount: 3

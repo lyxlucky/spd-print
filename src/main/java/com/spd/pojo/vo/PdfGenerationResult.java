@@ -38,4 +38,7 @@ public class PdfGenerationResult {
      * 错误信息（如果生成失败）
      */
     private String errorMessage;
+
+    /// 文档ID
+    private String docId;
 }

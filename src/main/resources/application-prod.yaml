@@ -1,12 +1,12 @@
 paperless:
-  appId: 532041839864005
-  accessKey: d8c7d2f13073fc7c3ff581917c303ec4f90d31d6
-  secretKey: cbf49f774905e20c1ed3546078a0c01d28be5a54c17d13ae55b8b0a5c92e5c49b00631502ce22287eb5e29d093d8c429f6c0f3e857c6808cda18806b99a0db0b
-  domainUrl: 172.27.2.104
+  appId: 545522489379205
+  accessKey: 3377e849e4b407647bf03bc999028c3e7d6b5f13
+  secretKey: 276582b5e80e8585cddb43c6576b121d67ebbfb95f3142f3addfcb9f0495e89d4b2a6bc8f6ce1c4d34fe94d853e834db74dac82315c2cd02c522c3f5318be72e
+  domainUrl: 10.8.7.216:90
   fileLocation: C:\spd-print
   paperlessDir: paperlessPdfs
   spd:
-    BaseUrl: 47.106.243.154:9001
-    documentUploadPath: /api/upload
+    BaseUrl: http://localhost:18002
+    documentUploadPath: /api/PekingApplication/receiptPaperlessPdf
     timeout: 30000
     retryCount: 3
