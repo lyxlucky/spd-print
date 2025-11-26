@@ -1,6 +1,7 @@
 package com.spd.controller;
 
 import com.spd.pojo.dto.DocumentInfo;
+import com.spd.pojo.dto.PaperlessWithGtDTO;
 import com.spd.pojo.dto.PekingPaperlessDTO;
 import com.spd.pojo.dto.SaveDocumentRequestDTO;
 import com.spd.pojo.vo.DocumentStatus;
@@ -66,6 +67,48 @@ public class PaperlessController extends BaseController {
         }
     }
 
+    @PostMapping("/generatePdfWithGt")
+    public ResponseVO generatePdfWithGt(@RequestBody PaperlessWithGtDTO data) {
+        try {
+            List<PdfGenerationResult> results = pdfboxUtil.generatePDFsFromGtDTO(data);
+
+            if (results == null || results.isEmpty()) {
+                return error("PDF生成失败：没有生成任何文件");
+            }
+
+            // 检查是否有生成失败的文件
+            List<PdfGenerationResult> failedResults = results.stream()
+                .filter(result -> !result.isSuccess())
+                .collect(java.util.stream.Collectors.toList());
+
+            if (!failedResults.isEmpty()) {
+                return error("部分PDF生成失败：" + failedResults.get(0).getErrorMessage());
+            }
+
+            // 所有文件生成成功，返回文件信息
+            log.info("PDF生成成功，共生成 {} 个文件", results.size());
+
+            // 调用第三方接口，传递文件路径、文档名称和docId
+            Map<String, DocumentInfo> documentInfoMap = new HashMap<>();
+            for (PdfGenerationResult result : results) {
+                DocumentInfo documentInfo = new DocumentInfo();
+                documentInfo.setDocumentName(result.getDocumentName());
+                documentInfo.setFileRelativePath(result.getFileRelativePath());
+                documentInfo.setDocId(result.getDocId());
+                documentInfoMap.put(result.getDocumentName(), documentInfo);
+            }
+
+            // 批量调用第三方接口（包含docId）
+            int successCount = thirdPartyApiService.batchUploadDocumentInfo(documentInfoMap);
+            log.info("第三方接口调用完成，成功: {}, 总数: {}", successCount, results.size());
+
+            return success(results);
+
+        } catch (IOException e) {
+            return error("生成PDF失败: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/generatePdf")
     public ResponseVO generatePdf(@RequestBody PekingPaperlessDTO data) {
         try {
@@ -110,8 +153,6 @@ public class PaperlessController extends BaseController {
     }
     
 
-
-    
     /**
      * 保存文档到无纸化系统
      * 

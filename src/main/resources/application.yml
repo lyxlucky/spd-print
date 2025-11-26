@@ -12,8 +12,7 @@ print:
     bdrmBaseUrl: 39.107.78.98:6049
     fileLocation: C:\spd-print
     lowValueTagDir: lowValueTagPdfs
-    type: false
-
+    type: true
 spring:
   profiles:
     active: dev

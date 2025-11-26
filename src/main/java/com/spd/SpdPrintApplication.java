@@ -15,7 +15,6 @@ public class SpdPrintApplication {
                 " \\__ \\ |_) | (_| |_____| |_) | |  | | | | | |_ \n" +
                 " |___/ .__/ \\__,_|     | .__/|_|  |_|_| |_|\\__|\n" +
                 "     |_|               |_|                     ");
-        System.out.println("spd-print启动成功");
     }
 
 }
